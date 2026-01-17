@@ -1,7 +1,7 @@
 ﻿using Backend.Application.Shared;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend.Api.Extensions;
+namespace Backend.Api.Shared.Extensions;
 
 public static class ResultsExtensions
 {

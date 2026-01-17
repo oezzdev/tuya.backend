@@ -1,10 +1,18 @@
 ﻿namespace Backend.Domain.Customers;
 
-public class Customer(string name, string email, string phone, string address)
+public class Customer
 {
-    public Guid Id { get; init; } = Guid.CreateVersion7();
-    public string Name { get; init; } = name;
-    public string Email { get; init; } = email;
-    public string Phone { get; init; } = phone;
-    public string Address { get; init; } = address;
+    public Customer(string name, string email, string phone, string address)
+    {
+        this.Name = name;
+        this.Email = email;
+        this.Phone = phone;
+        this.Address = address;
+    }
+
+    public Guid Id { get; init; } = Guid.NewGuid();
+    public string Name { get; init; }
+    public string Email { get; init; }
+    public string Phone { get; init; }
+    public string Address { get; init; }
 }

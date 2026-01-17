@@ -5,18 +5,26 @@ using Backend.Domain.Products;
 
 namespace Backend.Application.Orders.Commands;
 
-public class CreateOrderHandler(OrderService orderService, IOrderRepository orderRepository, ICustomerRepository customerRepository, IProductRepository productRepository) : IRequestHandler<CreateOrderCommand, CreateOrderResult>
+public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, CreateOrderResult>
 {
+    private readonly OrderService orderService;
+    private readonly IOrderRepository orderRepository;
+    private readonly ICustomerRepository customerRepository;
+    private readonly IProductRepository productRepository;
+
+    public CreateOrderHandler(OrderService orderService, IOrderRepository orderRepository, ICustomerRepository customerRepository, IProductRepository productRepository)
+    {
+        this.orderService = orderService;
+        this.orderRepository = orderRepository;
+        this.customerRepository = customerRepository;
+        this.productRepository = productRepository;
+    }
+
     public async Task<Result<CreateOrderResult>> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
     {
-        Customer? customer = await customerRepository.GetById(command.CustomerId, cancellationToken);
-        if (customer is null)
-        {
-            throw new InvalidOperationException("Customer not found.");
-        }
-
-        IEnumerable<Product> products = await productRepository.GetByIds(command.Items.Select(i => i.ProductId), cancellationToken);
-        if (products.Count() != command.Items.Count())
+        Customer? customer = await customerRepository.GetById(command.CustomerId, cancellationToken) ?? throw new InvalidOperationException("Customer not found.");
+        List<Product> products = await productRepository.GetByIds(command.Items.Select(i => i.ProductId), cancellationToken);
+        if (products.Count != command.Items.Count)
         {
             throw new InvalidOperationException("Some products not found.");
         }

@@ -2,10 +2,17 @@
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace Backend.Api.Cqrs;
+namespace Backend.Api.Shared.Cqrs;
 
-public class Mediator(IServiceProvider serviceProvider) : IMediator
+public class Mediator : IMediator
 {
+    private readonly IServiceProvider serviceProvider;
+
+    public Mediator(IServiceProvider serviceProvider)
+    {
+        this.serviceProvider = serviceProvider;
+    }
+
     public async Task<Result> Send<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest
     {
         IRequestHandler<TRequest> handler = serviceProvider.GetRequiredService<IRequestHandler<TRequest>>();
@@ -49,7 +56,7 @@ public class Mediator(IServiceProvider serviceProvider) : IMediator
 
         ValidationContext<TRequest> context = new(request);
         ValidationResult[] validationResults = await Task.WhenAll(validators.Select(v => v.ValidateAsync(context, cancellationToken)));
-        List<ValidationFailure> failures = [.. validationResults.SelectMany(r => r.Errors).Where(f => f != null)];
+        List<ValidationFailure> failures = validationResults.SelectMany(r => r.Errors).Where(f => f != null).ToList();
 
         if (failures.Count == 0)
         {

@@ -1,6 +1,8 @@
-﻿namespace Backend.Domain.Orders;
+﻿using Backend.Domain.Shared;
 
-public interface IOrderRepository
+namespace Backend.Domain.Orders;
+
+public interface IOrderRepository : IRepository<Order>
 {
-    Task Add(Order order, CancellationToken cancellationToken = default);
+    Task<Order?> GetDetailed(Guid id, CancellationToken cancellationToken);
 }

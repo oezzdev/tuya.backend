@@ -1,6 +1,7 @@
-﻿namespace Backend.Domain.Customers;
+﻿using Backend.Domain.Shared;
 
-public interface ICustomerRepository
+namespace Backend.Domain.Customers;
+
+public interface ICustomerRepository : IRepository<Customer>
 {
-    Task<Customer?> GetById(Guid id, CancellationToken cancellationToken = default);
 }

@@ -2,18 +2,24 @@
 
 namespace Backend.Domain.Orders;
 
-public class OrderItem(Guid orderId, Guid itemId)
+public class OrderItem
 {
-    public Guid OrderId { get; init; } = orderId;
-    public virtual Order? Order { get; init; }
-    public Guid ItemId { get; init; } = itemId;
-    public virtual Product? Item { get; init; }
-    public int Quantity { get; init; }
-    public decimal TotalPrice => Item?.Price * Quantity ?? 0;
+    public OrderItem(Guid orderId, Guid productId)
+    {
+        OrderId = orderId;
+        ProductId = productId;
+    }
 
-    public OrderItem(Order order, Product item) : this(order.Id, item.Id)
+    public OrderItem(Order order, Product product) : this(order.Id, product.Id)
     {
         Order = order;
-        Item = item;
+        Product = product;
     }
+
+    public Guid OrderId { get; init; }
+    public virtual Order? Order { get; init; }
+    public Guid ProductId { get; init; }
+    public virtual Product? Product { get; init; }
+    public int Quantity { get; init; }
+    public decimal TotalPrice => Product?.Price * Quantity ?? 0;
 }

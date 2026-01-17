@@ -1,9 +1,9 @@
-﻿using Backend.Api.Cqrs;
+﻿using Backend.Api.Shared.Cqrs;
 using Backend.Application.Shared;
 using FluentValidation;
 using System.Reflection;
 
-namespace Backend.Api.Extensions;
+namespace Backend.Api.Shared.Extensions;
 
 public static class MediatorExtensions
 {
@@ -35,7 +35,9 @@ public static class MediatorExtensions
 
         foreach (Type handlerType in requestHandlerTypes)
         {
-            Type[] interfaceTypes = [.. handlerType.GetInterfaces().Where(i => i.IsGenericType && i.IsGenericType && (i.GetGenericTypeDefinition() == requestHandlerType || i.GetGenericTypeDefinition() == requestHandlerType2))];
+            Type[] interfaceTypes = handlerType.GetInterfaces()
+                .Where(i => i.IsGenericType && i.IsGenericType && (i.GetGenericTypeDefinition() == requestHandlerType || i.GetGenericTypeDefinition() == requestHandlerType2))
+                .ToArray();
             foreach (Type interfaceType in interfaceTypes)
             {
                 services.AddScoped(interfaceType, handlerType);

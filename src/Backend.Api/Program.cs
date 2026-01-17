@@ -1,41 +1,42 @@
+using Backend.Api.Shared.Extensions;
+using Backend.Domain.Orders;
+using Backend.Infrastructure.Shared;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services
+    .AddPersistence(builder.Configuration)
+    .AddScoped<OrderService>();
+
+builder.Services
+    .AddMediator(options => options.Locations = new Assembly[] { Backend.Application.Assembly.Instance });
+
+builder.Services
+    .AddControllers()
+    .ConfigureApiBehaviorOptions(o => o.SuppressModelStateInvalidFilter = true);
+
+builder.Services
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "Backend API", Description = "Backend API", Version = "v1" }));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.Services.CreateScope().ServiceProvider.GetRequiredService<BackendContext>().Database.EnsureCreated();
+    app.UseSwagger(options => options.RouteTemplate = "openapi/{documentName}/openapi.json");
+
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1/openapi.json", "v1");
+        options.RoutePrefix = "openapi";
+    });
 }
 
+app.UseStaticFiles();
 app.UseHttpsRedirection();
+app.MapControllers();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
-app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+await app.RunAsync();
