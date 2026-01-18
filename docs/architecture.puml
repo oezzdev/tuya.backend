@@ -1,0 +1,84 @@
+@startuml ArchitectureDiagram
+
+skinparam class {
+    BackgroundColor White
+    BorderColor #6A6A6A
+    ArrowColor #6A6A6A
+    StereotypeFontColor #6A6A6A
+}
+skinparam ArrowThickness 1
+skinparam ArrowStyle Orthogonal
+
+package "Api" {
+  class EntitiesController {
+    + Command(request: Command): ActionResult<CommandResult>
+    + Query(request: Query): ActionResult<QueryResult>
+  }
+  class Mediator {
+    + Send<TRequest, TResponse>(request: TRequest): Result<TResponse>
+  }
+}
+
+package "Application" {
+  class CommandHandler {
+    + Handle(request: Command): CommandResult
+  }
+  class QueryHandler {
+    + Handle(request: Query): QueryResult
+  }
+  interface IMediator {
+    Send<TRequest, TResponse>(request: TRequest): Result<TResponse>
+  }
+}
+
+package "Domain" {
+  class Entity {
+      + Id: Guid
+  }
+  interface IEntityRepository {
+  }
+  class EntityService {
+    + Process(entity: Entity): Entity
+  }
+  interface IRepository<T> {
+    Add(entity: T)
+    GetById(id: Guid): T
+    Update(entity: T)
+  }
+}
+
+package "Infrastructure" {
+  class EntityRepository {
+  }
+  class Repository<T> {
+    + Add(entity: T)
+    + GetById(id: Guid): T
+    + Update(entity: T)
+  }
+  class Context {
+    + Entities: DbSet<Entity>
+  }
+}
+
+IRepository <|.. Repository : implements
+Repository --> Context : <<Use>>
+Repository <|.. EntityRepository : inherit
+IRepository <|.. IEntityRepository : inherit
+IEntityRepository <|.. EntityRepository : implements
+
+EntityService --> Entity : <<use>>
+
+IMediator <|.. Mediator : implements
+
+CommandHandler --> EntityService : <<Use>>
+CommandHandler --> IEntityRepository : <<Use>>
+CommandHandler --> Entity : <<Use>>
+
+QueryHandler --> EntityService : <<Use>>
+QueryHandler --> IEntityRepository : <<Use>>
+QueryHandler --> Entity : <<Use>>
+
+EntitiesController --> Mediator: <<use>>
+
+Mediator --> CommandHandler : <<Use>>
+Mediator --> QueryHandler : <<Use>>

@@ -16,7 +16,8 @@ Proyectos:
 
 ## Resumen de la arquitectura
 
-Ver diagrama aquí: [docs/diagram.png](docs/diagram.png)
+![Diagrama de Arquitectura](./docs/architecture.png)
+Ver diagrama completo aquí: [Diagrama de código](./docs/diagram.png)
 
 - Separación en capas:
     - `API` depende de `Application` e `Infrastructure`, se encarga de levantar la aplicación y gestionar las dependencias.

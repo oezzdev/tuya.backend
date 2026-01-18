@@ -25,12 +25,12 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, CreateOrde
         Customer? customer = await customerRepository.GetById(command.CustomerId, cancellationToken);
         if (customer is null)
         {
-            return Error.Validation(new List<string> { "Customer not found." });
+            return Error.Validation("Customer not found.");
         }
         List<Product> products = await productRepository.GetByIds(command.Items.Select(i => i.ProductId), cancellationToken);
         if (products.Count != command.Items.Count)
         {
-            return Error.Validation(new List<string> { "One or more products not found." });
+            return Error.Validation("One or more products not found.");
         }
 
         IEnumerable<(Product, int)> items = command.Items
