@@ -13,13 +13,20 @@ public abstract class Repository<T> : IRepository<T> where T : class
         Context = context;
     }
 
-    public Task Add(T entity, CancellationToken cancellationToken = default)
+    public async Task Add(T entity, CancellationToken cancellationToken = default)
     {
-        return DbSet.AddAsync(entity, cancellationToken).AsTask();
+        await DbSet.AddAsync(entity, cancellationToken);
+        await Context.SaveChangesAsync(cancellationToken);
     }
 
     public Task<T?> GetById(Guid id, CancellationToken cancellationToken = default)
     {
         return DbSet.FindAsync(new object[] { id }, cancellationToken).AsTask();
+    }
+
+    public async Task Update(T entity, CancellationToken cancellationToken = default)
+    {
+        DbSet.Update(entity);
+        await Context.SaveChangesAsync(cancellationToken);
     }
 }

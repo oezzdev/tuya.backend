@@ -4,13 +4,14 @@ namespace Backend.Domain.Orders;
 
 public class OrderItem
 {
-    public OrderItem(Guid orderId, Guid productId)
+    public OrderItem(Guid orderId, Guid productId, int quantity = 1)
     {
         OrderId = orderId;
         ProductId = productId;
+        Quantity = quantity;
     }
 
-    public OrderItem(Order order, Product product) : this(order.Id, product.Id)
+    public OrderItem(Order order, Product product, int quantity = 1) : this(order.Id, product.Id, quantity)
     {
         Order = order;
         Product = product;

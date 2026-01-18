@@ -5,4 +5,8 @@
     <Project Path="src/Backend.Domain/Backend.Domain.csproj" />
     <Project Path="src/Backend.Infrastructure/Backend.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Backend.Api.Tests/Backend.Api.Tests.csproj" Id="3237db5f-06e4-4bd5-a692-86be897938a4" />
+    <Project Path="tests/Backend.Domain.Tests/Backend.Domain.Tests.csproj" Id="baaf329c-85b3-4e07-a636-cba5ed0dcbf4" />
+  </Folder>
 </Solution>

@@ -3,10 +3,10 @@ using Backend.Domain.Orders;
 
 namespace Backend.Application.Orders.Queries.GetOrderById;
 
-public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, GetOrderByIdResult>
+public class GetOrderByIdHandler : IRequestHandler<GetOrderByIdQuery, GetOrderByIdResult>
 {
     private readonly IOrderRepository orderRepository;
-    public GetOrderByIdQueryHandler(IOrderRepository orderRepository)
+    public GetOrderByIdHandler(IOrderRepository orderRepository)
     {
         this.orderRepository = orderRepository;
     }

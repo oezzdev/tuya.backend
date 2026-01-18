@@ -3,7 +3,7 @@ using Backend.Domain.Customers;
 using Backend.Domain.Orders;
 using Backend.Domain.Products;
 
-namespace Backend.Application.Orders.Commands;
+namespace Backend.Application.Orders.Commands.CreateOrder;
 
 public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, CreateOrderResult>
 {
@@ -22,11 +22,15 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, CreateOrde
 
     public async Task<Result<CreateOrderResult>> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
     {
-        Customer? customer = await customerRepository.GetById(command.CustomerId, cancellationToken) ?? throw new InvalidOperationException("Customer not found.");
+        Customer? customer = await customerRepository.GetById(command.CustomerId, cancellationToken);
+        if (customer is null)
+        {
+            return Error.Validation(new List<string> { "Customer not found." });
+        }
         List<Product> products = await productRepository.GetByIds(command.Items.Select(i => i.ProductId), cancellationToken);
         if (products.Count != command.Items.Count)
         {
-            throw new InvalidOperationException("Some products not found.");
+            return Error.Validation(new List<string> { "One or more products not found." });
         }
 
         IEnumerable<(Product, int)> items = command.Items

@@ -1,0 +1,133 @@
+@startuml ArchitectureDiagram
+
+skinparam class {
+    BackgroundColor White
+    BorderColor #6A6A6A
+    ArrowColor #6A6A6A
+    StereotypeFontColor #6A6A6A
+}
+skinparam ArrowThickness 1
+skinparam ArrowStyle Orthogonal
+
+package "Api" {
+  class OrdersController {
+    + CreateOrder(request: CreateOrderCommand): ActionResult<CreateOrderResult>
+    + GetOrderById(request: GetOrderByIdQuery): ActionResult<GetOrderByIdResult>
+  }
+}
+
+package "Application" {
+  package "Orders" {
+    class CreateOrderHandler {
+      + Handle(request: CreateOrderCommand): CreateOrderResult
+    }
+    class GetOrderByIdHandler {
+      + Handle(request: GetOrderByIdQuery): GetOrderByIdResult
+    }
+    
+  }
+}
+
+package "Domain" {
+  package "Customers" {
+    class Customer {
+      + Id: Guid
+      + Name: tring
+      + Email: string
+      + Phone: string
+      + Address: string
+    }
+    interface ICustomerRepository {
+    }
+  }
+  package "Orders" {
+    class Order {
+      + Id: Guid
+      + CustomerId: Guid
+      + Customer: Customer?
+      + Date: DateTimeOffset
+      + Items: OrderItem[]?
+      + TotalAmount: decimal
+    }
+    interface IOrderRepository {
+      GetDetailed(id: Guid) : Order?
+    }
+    class OrderItem {
+      + OrderId: Guid
+      + Order: Order?
+      + ProductId: Guid
+      + Product: Product?
+      + Quantity: int
+      + TotalPrice: decimal
+    }
+    class OrderService {
+      + ProcessOrder(customer: Customer, items: (Product, int)[]): Order
+    }
+  }
+  package Products {
+    interface IProductRepository {
+      GetByIds(ids: Guid[]) : Product[]
+    }
+    class Product {
+      + Id: Guid
+      + Name: string
+      + Price: decimal
+      + OrderItems: OrderItem[]?
+    }
+  }
+  package "Shared" {
+    interface IRepository<T> {
+      Add(entity: T)
+      GetById(id: Guid): T
+    }
+  }
+  
+}
+
+package "Infrastructure" {
+  package "Customers" {
+    class CustomerRepository {
+    }
+
+  }
+  package "Orders" {
+    class OrderRepository {
+      + GetDetailed(id: Guid): Order?
+    }
+  }
+  package "Products" {
+    class ProductRepository {
+      + GetByIds(ids: Guid[]) : Product[]
+    }
+  }
+  package "Shared" {
+    class Repository<T> {
+      + Add(entity: T)
+      + GetById(id: Guid): T
+    }
+    class BackendContext {
+      + Orders: DbSet<Order>
+      + Customers: DbSet<Customer>
+      + Products: DbSet<Product>
+    }
+  }
+}
+
+IRepository <|.. Repository : implements
+Repository --> BackendContext : <<Use>>
+Repository <|.. CustomerRepository : implements
+ICustomerRepository <|.. CustomerRepository : implements
+Repository <|.. OrderRepository : implements
+IOrderRepository <|.. OrderRepository : implements
+Repository <|.. ProductRepository : implements
+IProductRepository <|.. ProductRepository : implements
+
+CreateOrderHandler --> OrderService : <<Use>>
+CreateOrderHandler --> IOrderRepository : <<Use>>
+CreateOrderHandler --> ICustomerRepository : <<Use>>
+CreateOrderHandler --> IProductRepository : <<Use>>
+
+GetOrderByIdHandler --> IOrderRepository : <<Use>>
+
+OrdersController --> CreateOrderHandler : <<Use>>
+OrdersController --> GetOrderByIdHandler : <<Use>>
