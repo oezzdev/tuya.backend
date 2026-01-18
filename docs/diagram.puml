@@ -13,6 +13,7 @@ package "Api" {
   class OrdersController {
     + CreateOrder(request: CreateOrderCommand): ActionResult<CreateOrderResult>
     + GetOrderById(request: GetOrderByIdQuery): ActionResult<GetOrderByIdResult>
+    + CancelOrder(request: CancelOrderCommand): ActionResult<CancelOrderResult>
   }
 }
 
@@ -24,7 +25,9 @@ package "Application" {
     class GetOrderByIdHandler {
       + Handle(request: GetOrderByIdQuery): GetOrderByIdResult
     }
-    
+    class CancelOrderHandler {
+      + Handle(request: CancelOrderCommand): CancelOrderResult
+    }
   }
 }
 
@@ -128,6 +131,11 @@ CreateOrderHandler --> ICustomerRepository : <<Use>>
 CreateOrderHandler --> IProductRepository : <<Use>>
 
 GetOrderByIdHandler --> IOrderRepository : <<Use>>
+GetOrderByIdHandler --> Order : <<Use>>
+
+CancelOrderHandler --> IOrderRepository : <<Use>>
+CancelOrderHandler --> Order : <<Use>>
 
 OrdersController --> CreateOrderHandler : <<Use>>
 OrdersController --> GetOrderByIdHandler : <<Use>>
+OrdersController --> CancelOrderHandler : <<Use>>
