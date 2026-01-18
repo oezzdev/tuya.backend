@@ -34,10 +34,10 @@ public class OrdersController : ControllerBase
         return result.Match(Ok, ResultsExtensions.HandleError);
     }
 
-    [HttpDelete]
-    public async Task<ActionResult<CancelOrderResult>> CancelOrder(CancelOrderCommand request)
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<CancelOrderResult>> CancelOrder(Guid id)
     {
-        Result<CancelOrderResult> result = await mediator.Send<CancelOrderCommand, CancelOrderResult>(request);
+        Result<CancelOrderResult> result = await mediator.Send<CancelOrderCommand, CancelOrderResult>(new(id));
         return result.Match(NoContent, ResultsExtensions.HandleError);
     }
 }

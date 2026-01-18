@@ -20,17 +20,16 @@ public class BackendContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        //modelBuilder.Entity<OrderItem>()
-        //    .HasOne(oi => oi.Order)
-        //    .WithMany(o => o.Items)
-        //    .HasForeignKey(oi => oi.OrderId);
-
-        //modelBuilder.Entity<OrderItem>()
-        //    .HasOne(oi => oi.Product)
-        //    .WithMany(o => o.OrderItems)
-        //    .HasForeignKey(oi => oi.ProductId);
-
         modelBuilder.Entity<OrderItem>()
             .HasKey(oi => new { oi.OrderId, oi.ProductId });
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        base.ConfigureConventions(configurationBuilder);
+
+        configurationBuilder
+            .Properties<Guid>()
+            .HaveConversion<string>();
     }
 }
